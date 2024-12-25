@@ -19,7 +19,7 @@ const OtpService = async (email, callback) => {
 }
 
 const SignupService = async (email, password, callback) => {
-    const { User, Token } = require("../models");
+    const { User, Tokens, Roles } = require("../models");
     const bcrypt = require('bcrypt');
     const jwt = require('jsonwebtoken');
     const dotenv = require('dotenv').config();
@@ -49,8 +49,11 @@ const SignupService = async (email, password, callback) => {
             { expiresIn: '7d' } // Refresh token valid for 7 days
         );
 
-        const tokens = await Token.create({ userid: user.dataValues.userid, access_token: accessToken, refresh_token: refreshToken });
-
+        const tokens = await Tokens.create({ userid: user.dataValues.userid, access_token: accessToken, refresh_token: refreshToken });
+        if (!tokens) {
+            return callback('Token not created', null);
+        }
+        const role = await Roles.create({ userid: user.dataValues.userid, Role: 'manager', Status: 'pending' });
         // Respond with tokens
         callback(null, {
             message: 'Signup successful',
