@@ -11,7 +11,7 @@ const getAssignedEventsService = async (userId, callback) => {
         }));
         //check if events are found
         if (!events) {
-            return callback({ message: "No events found" }, null);
+            return callback({ message: "No events founded" }, null);
         }
         // Respond with success
         callback(null, events);

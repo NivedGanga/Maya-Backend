@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database');
 
-const Event = dbConnection.define('Event', {
+const Event = dbConnection.define('event', {
     eventid: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -31,7 +31,7 @@ const Event = dbConnection.define('Event', {
     },
 }, {
     timestamps: false, // Disable automatic createdAt and updatedAt fields
-    tableName: 'Events', // Explicitly define the table name
+    tableName: 'events', // Explicitly define the table name
 });
 
 module.exports = Event;

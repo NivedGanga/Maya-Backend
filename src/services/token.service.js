@@ -11,11 +11,10 @@ const refreshTokenService = async (refreshToken, callback) => {
         }
         // Check if the refresh token exists in the database
         const token = await Tokens.findOne({ where: { refresh_token: refreshToken } })
-        console.log(token);
         if (!token) {
             return callback('Invalid refresh token', null);
         }
-
+        console.log('Tokesssn');
         // Generate a new access token
         const accessToken = jwt.sign(
             { userId: user.userId, email: user.email },

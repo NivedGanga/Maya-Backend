@@ -3,14 +3,6 @@ const dotenv = require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
 try {
-    console.log(process.env.DB_USER);
-    const connection = mysql.createPool({
-        host: process.env.HOST,
-        user: process.env.DB_USER,
-        port: process.env.DB_PORT,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-    });
     const dbConnection = new Sequelize({
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
@@ -20,15 +12,24 @@ try {
         dialect: 'mysql',
         logging: false
     });
+    //print all tables in db
+    dbConnection.query('SHOW TABLES').then(([results, metadata]) => {
+        console.log(results);
+    });
+    //also check db connection
+    dbConnection.authenticate()
+        .then(() => {
+            console.log('Connection has been established successfully.');
+        })
+        .catch((error) => {
+            // console.error('Unable to connect to the database:', error);
+        });
     module.exports = {
         dbConnection,
-        connection
     };
-    console.log('Connected to DB');
+
 } catch (error) {
     console.error('Error connecting to DB', error);
     process.exit(1);
 }
-
-
 

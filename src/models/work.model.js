@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database'); // Import Sequelize instance
 
-const Work = dbConnection.define('Work', {
+const Work = dbConnection.define('work', {
     workid: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -12,7 +12,7 @@ const Work = dbConnection.define('Work', {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
-            model: 'Events', // Table name of the associated model
+            model: 'events', // Table name of the associated model
             key: 'eventid',  // Column in the Events table
         },
         onDelete: 'CASCADE', // Cascade deletion when an event is deleted
@@ -21,7 +21,7 @@ const Work = dbConnection.define('Work', {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
-            model: 'Users', // Table name of the associated model
+            model: 'users', // Table name of the associated model
             key: 'userid',   // Column in the Users table
         },
     },
@@ -32,7 +32,7 @@ const Work = dbConnection.define('Work', {
     },
 }, {
     timestamps: false, // Disable automatic createdAt and updatedAt fields
-    tableName: 'Work', // Explicitly define the table name
+    tableName: 'work', // Explicitly define the table name
 });
 
 module.exports = Work;

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database'); // Import Sequelize instance
 
-const Tokens = dbConnection.define('Tokens', {
+const Tokens = dbConnection.define('tokens', {
     refresh_token: {
         type: DataTypes.STRING(512),
         primaryKey: true,
@@ -22,7 +22,7 @@ const Tokens = dbConnection.define('Tokens', {
     },
 }, {
     timestamps: false, // Disable automatic createdAt and updatedAt fields
-    tableName: 'Tokens', // Explicitly define the table name
+    tableName: 'tokens', // Explicitly define the table name
     underscored: true, // Use snake_case column names if needed
 });
 

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database');
 
-const Users = dbConnection.define('Users', {
+const Users = dbConnection.define('users', {
     userid: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -31,7 +31,7 @@ const Users = dbConnection.define('Users', {
     },
 }, {
     timestamps: false,
-    tableName: 'Users',
+    tableName: 'users',
 });
 
 module.exports = Users;

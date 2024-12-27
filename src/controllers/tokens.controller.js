@@ -1,8 +1,6 @@
 const { refreshTokenService } = require('../services/token.service');
 const refreshTokenRequest = async (req, res) => {
     const { refreshToken } = req.body;
-    //print current datetime
-    console.log(new Date().toISOString());
     //check if refresh token is provided
     if (!refreshToken) {
         return res.status(400).json({ message: 'Refresh token is required' });

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Main Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maya-backend
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+          target: /app/src
+          ignore: 
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    ports:
+      - "5001:5001" # Expose port 5001 for the backend
+    env_file:
+      - .env # Use the existing .env file
+    depends_on:
+      - db
+    volumes:
+      - .:/app # Mount the current directory into the container for live changes
+      - /app/node_modules # Ignore node_modules to prevent conflicts
+    command: ["./wait-for-it.sh", "db:3306", "--", "npx", "nodemon", "src/index.js"]
+
+  # Database Service
+  db:
+    image: mysql:8.0
+    container_name: maya-db
+    environment:
+      DB_PASSWORD: itsforDATABASE_123 # Set root password
+      DB_NAME: maya # Set the database name
+      DB_USER: root # Set the database user
+      # Do not set MYSQL_USER and MYSQL_PASSWORD for root user
+    ports:
+      - "3308:3306" # Expose port 3306 for the database
+    volumes:
+      - db_data:/var/lib/mysql
+      # - ./maya.sql:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:

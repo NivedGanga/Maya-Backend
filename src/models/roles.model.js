@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database'); // Import Sequelize instance
 
-const Roles = dbConnection.define('Roles', {
+const Roles = dbConnection.define('roles', {
     userid: {
         type: DataTypes.BIGINT,
         allowNull: false,
@@ -17,7 +17,7 @@ const Roles = dbConnection.define('Roles', {
     },
 }, {
     timestamps: false, // Disable automatic createdAt and updatedAt fields
-    tableName: 'Roles', // Explicitly define the table name
+    tableName: 'roles', // Explicitly define the table name
     underscored: true, // Use snake_case column names if needed
 });
 

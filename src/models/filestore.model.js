@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { dbConnection } = require('../config/database'); // Import Sequelize instance
 
-const Filestore = dbConnection.define('Filestore', {
+const Filestore = dbConnection.define('filestore', {
     fileid: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -20,14 +20,14 @@ const Filestore = dbConnection.define('Filestore', {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
-            model: 'Events', // Table name of the associated model
+            model: 'events', // Table name of the associated model
             key: 'eventid',  // Column in the Events table
         },
         onDelete: 'CASCADE', // Cascade deletion when an event is deleted
     },
 }, {
     timestamps: false, // Disable automatic createdAt and updatedAt fields
-    tableName: 'Filestore', // Explicitly define the table name
+    tableName: 'filestore', // Explicitly define the table name
     underscored: true, // Use snake_case column names if needed
 });
 
