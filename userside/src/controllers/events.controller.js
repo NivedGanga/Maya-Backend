@@ -97,6 +97,7 @@ const getAssigedUsersRequest = async (req, res) => {
 const uploadEventImageRequest = async (req, res) => {
     //get event id from params
     const eventId = req.query.eventId;
+    console.log(eventId); 
     //check if event id is provided
     if (!eventId) {
         return res.status(400).json({ message: 'Event ID is required' });

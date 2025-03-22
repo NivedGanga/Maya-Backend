@@ -2,7 +2,9 @@ const { Events, Filestore } = require('../models');
 const { upload } = require('../config/file');
 const fs = require("fs");
 const path = require("path");
-
+const { fetchAndSendBatch } = require('./imageproc.service');
+const { Readable } = require("stream"); // For converting buffer to stream
+const cloudinary = require('../config/cloudinary');
 const createEventService = (eventName, eventDescription, startDate, endDate, callback) => {
     try {
         // Create the event
@@ -165,51 +167,49 @@ const getAssignedUsersService = async (eventid, callback) => {
         callback(error, null);
     }
 }
+function bufferToStream(buffer) {
+    const stream = new Readable();
+    stream.push(buffer);
+    stream.push(null); // Signal end of stream
+    return stream;
+}
 
 const uploadEventImageService = async (eventId, file, callback) => {
     try {
-        // Check if event exists
-        const event = await Events.findOne({ where: { eventid: eventId } });
-        if (!event) {
-            return callback({ message: "Event not found" }, null);
-        }
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: "your-folder-name", // Replace with your Cloudinary folder name
+                public_id: `${Date.now()}_${file.originalname.replace(/ /g, "_")}`,
+            },
+            async (err, result) => {
+                if (err) {
+                    console.error("Cloudinary upload error:", err);
+                    return callback(err, null);
+                }
+                console.log("Uploaded to Cloudinary:", result.url);
 
-        // Define the directory where the file will be saved
-        const uploadDir = path.join(".", "src", "uploads"); // Example: /uploads folder in the project root
+                // Optionally save the metadata to your database
+                const filestore = await Filestore.create({
+                    eventid: eventId,
+                    filename: file.originalname,
+                    url: result.secure_url,
+                });
 
-        // Create the directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+                // Check if file is saved
+                if (!filestore) {
+                    return callback("File not saved", null);
+                }
 
-        // Define the full file path set current date and time as file name
-        const filename = `${Date.now()}_${file.originalname.replace(/ /g, "_")}`;
-        const filePath = path.join(uploadDir, filename);
-        const relativePath = path.join("uploads", filename);
-        // Write the file buffer to the specified path
-        fs.writeFile(filePath, file.buffer, async (err) => {
-            if (err) {
-                console.error("File save error:", err);
-                return callback(err, null);
+                // Respond with success message
+                callback(null, {
+                    message: "Image uploaded successfully",
+                    path: result.secure_url,
+                });
+                fetchAndSendBatch(); // Assuming this is a function to execute post-upload tasks
             }
-            console.log("File saved to:", filePath);
-
-            // Optionally save the file path or metadata to your database
-            const filestore = await Filestore.create({
-                eventid: eventId,
-                filename: file.originalname,
-                url: relativePath,
-            });
-
-            //check if file is saved
-            if (!filestore) {
-                return callback('File not saved', null);
-            }
-
-            const fileUrl = `${process.env.BASE_URL || "http://localhost:5001"}/uploads/${filename}`;
-            // Respond with success message
-            callback(null, { message: "Image uploaded successfully", path: fileUrl });
-        });
+        );
+        // Convert buffer to stream and pipe it to the upload stream
+        bufferToStream(file.buffer).pipe(uploadStream);
     } catch (error) {
         console.error("Service error:", error);
         callback(error, null);

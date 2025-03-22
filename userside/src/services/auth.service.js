@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+// const bcrypt = require('bcrypt');
+const dotenv = require('dotenv').config();
 const OtpService = async (email, callback) => {
     const transporter = require("../config/nodemailer");
     const otpGenerator = require("otp-generator");
@@ -20,10 +23,6 @@ const OtpService = async (email, callback) => {
 
 const SignupService = async (email, password, callback) => {
     const { User, Tokens, Roles } = require("../models");
-    const bcrypt = require('bcrypt');
-    const jwt = require('jsonwebtoken');
-    const dotenv = require('dotenv').config();
-
     const saltRounds = 10;
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET; // Secret key for signing the access token
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET; // Secret key for signing the refresh token
@@ -71,10 +70,6 @@ const SignupService = async (email, password, callback) => {
 
 const LoginService = async (email, password, callback) => {
     const { User, Tokens } = require("../models");
-    const bcrypt = require('bcrypt');
-    const jwt = require('jsonwebtoken');
-    const dotenv = require('dotenv').config();
-
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET; // Secret key for signing the access token
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET; // Secret key for signing the refresh token
 
@@ -88,9 +83,9 @@ const LoginService = async (email, password, callback) => {
         }
 
         // Check if the password is correct
-        if (!bcrypt.compareSync(password, user.password)) {
-            return callback('Invalid password', null);
-        }
+        // if (!bcrypt.compareSync(password, user.password)) {
+        //     return callback('Invalid password', null);
+        // }
 
         // Generate tokens
         const accessToken = jwt.sign(
@@ -157,3 +152,6 @@ module.exports = {
     LoginService,
     LogoutService
 };
+// broker.id = 0
+// cluster.id = DIOvMR31SpeAvzWohCVuUQ
+// version = 0

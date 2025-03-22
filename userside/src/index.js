@@ -5,8 +5,9 @@ const sessionMiddleware = require('./middleware/session.middleware');
 const adminMiddleware = require('./middleware/admin.middleware');
 const dotenv = require('dotenv').config();
 const authorizeUser = require('./middleware/tokens.middleware');
+const { fetchAndSendBatch } = require('./services/imageproc.service');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.USER_SIDE_PORT || 5001;
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -27,3 +28,5 @@ app.use('/', routes);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+//fetchAndSendBatch();

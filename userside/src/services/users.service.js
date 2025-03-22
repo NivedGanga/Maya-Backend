@@ -3,7 +3,7 @@ const getUsersService = async (status, email, callback) => {
     const { Op } = require("sequelize");
 
     try {
-        // Find all roles matching the given status
+        // Find all roles matching the given status 
         const roleUsers = await Roles.findAll({ where: { Status: status } });
         const userIds = roleUsers.map((roleUser) => roleUser.userid);
 

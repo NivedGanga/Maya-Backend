@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+// const mysql = require('mysql2');
 const dotenv = require('dotenv').config();
 const { Sequelize } = require('sequelize');
 
@@ -10,11 +10,8 @@ try {
         host: process.env.HOST,
         port: process.env.DB_PORT,
         dialect: 'mysql',
+        // ssl: true,
         logging: false
-    });
-    //print all tables in db
-    dbConnection.query('SHOW TABLES').then(([results, metadata]) => {
-        console.log(results);
     });
     //also check db connection
     dbConnection.authenticate()
@@ -22,7 +19,7 @@ try {
             console.log('Connection has been established successfully.');
         })
         .catch((error) => {
-            // console.error('Unable to connect to the database:', error);
+            console.error('Unable to connect to the database:', error);
         });
     module.exports = {
         dbConnection,
