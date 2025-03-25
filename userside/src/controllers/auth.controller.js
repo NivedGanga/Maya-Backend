@@ -4,7 +4,7 @@ const { OtpService, SignupService, LoginService, LogoutService } = require('../s
 
 const OtpRequest = async (req, res) => {
     const { email } = req.body;
-
+    console.log(process.env.SESSION_SECRET);
     // check email is provided
     if (!email) {
         return res.status(400).json({ message: 'Email is required' });
@@ -35,8 +35,7 @@ const OtpRequest = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         }
         req.session.otp = success;
-        req.session.email = email;
-        res.status(200).json({ message: 'OTP sent' });
+        req.session.save(() => res.send('OTP generated'));
     })
 }
 
@@ -44,7 +43,7 @@ const verifyOtpRequest = async (req, res) => {
     const { otp } = req.body;
     // check otp is provided
     if (!req.session.otp) {
-        return res.status(400).json({ message: 'No OTP sent' });
+        return res.status(400).json({ message: "no otp send" });
     }
     // check otp is verified
     if (req.session.otp !== otp) {

@@ -16,6 +16,10 @@ const Filestore = dbConnection.define('filestore', {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
+    filesize: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+    },
     eventid: {
         type: DataTypes.BIGINT,
         allowNull: false,

@@ -1,13 +1,18 @@
 const session = require('express-session');
 const dotenv = require('dotenv').config();
-
+const MemoryStore = require('memorystore')(session);
 const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET, // Secret key for signing the session
-    resave: false,                  // Do not save the session if it wasn't modified
-    saveUninitialized: false,       // Don't save uninitialized sessions
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: new MemoryStore({
+        checkPeriod: 86400000, // Prune expired entries every 24 hours (in ms)
+    }),
     cookie: {
-        secure: false,                // Set to true for HTTPS connections
-        maxAge: 5 * 60 * 1000,       // Session expires after 30 minutes
+        secure: false,
+        httpOnly: false,
+        sameSite: false,
+        maxAge: 5 * 60 * 1000, // 5 minutes expiry (matches your original)
     }
 });
 

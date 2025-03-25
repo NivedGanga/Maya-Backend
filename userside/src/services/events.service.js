@@ -35,8 +35,22 @@ const getEventsService = async (status, callback) => {
         if (!res) {
             return callback({ message: "No events found" }, null);
         }
+
         let events = res.map(event => event.dataValues);
-        // check statuses upcoming ongoing and past with current date
+
+        // Fetch banner images for all events
+        for (const event of events) {
+            // Find the first image in filestore for this event
+            const banner = await Filestore.findOne({
+                where: { eventid: event.eventid },
+                order: [['fileid', 'ASC']] // Get the first uploaded image
+            });
+
+            // Add banner URL to event object
+            event.banner = banner ? banner.url : null;
+        }
+
+        // Filter events based on status
         if (status === 'upcoming') {
             events = events.filter(event => new Date(event.startDate) > new Date());
         } else if (status === 'ongoing') {
@@ -44,12 +58,14 @@ const getEventsService = async (status, callback) => {
         } else if (status === 'completed') {
             events = events.filter(event => new Date(event.endDate) < new Date());
         } else if (status === 'all') {
+            // Return all events, no filtering needed
         } else {
             return callback({ message: "Invalid status" }, null);
         }
+
         // Respond with events
         callback(null, { events: events });
-        console.log('Events found');
+        console.log('Events found with banner images');
 
     } catch (error) {
         // Log the error
@@ -193,6 +209,7 @@ const uploadEventImageService = async (eventId, file, callback) => {
                     eventid: eventId,
                     filename: file.originalname,
                     url: result.secure_url,
+                    filesize: file.size,
                 });
 
                 // Check if file is saved
@@ -252,6 +269,24 @@ const deleteEventImageService = async (eventId, fileid, callback) => {
         callback(error, null);
     }
 }
+
+const getEventDetailsService = async (eventId, callback) => {
+    try {
+        // Find the event
+        const event = await Events.findOne({ where: { eventid: eventId } });
+
+        if (!event) {
+            return callback({ message: "Event not found" }, null);
+        }
+
+        // Respond with the event
+        callback(null, { event: event });
+    } catch (error) {
+        console.error(error);
+        callback(error, null);
+    }
+}
+
 module.exports = {
     createEventService,
     getEventsService,
@@ -261,5 +296,6 @@ module.exports = {
     getAssignedUsersService,
     uploadEventImageService,
     getEventImagesService,
-    deleteEventImageService
+    deleteEventImageService,
+    getEventDetailsService
 };

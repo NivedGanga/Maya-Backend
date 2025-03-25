@@ -39,13 +39,13 @@ const SignupService = async (email, password, callback) => {
         const accessToken = jwt.sign(
             { userId: user.dataValues.userid, email: user.dataValues.email },
             accessTokenSecret,
-            { expiresIn: '1h' } // Access token valid for 1 hour
+            { expiresIn: '30d' } // Access token valid for 1 hour
         );
 
         const refreshToken = jwt.sign(
             { userId: user.dataValues.userid, email: user.dataValues.email },
             refreshTokenSecret,
-            { expiresIn: '7d' } // Refresh token valid for 7 days
+            { expiresIn: '60d' } // Refresh token valid for 7 days
         );
 
         const tokens = await Tokens.create({ userid: user.dataValues.userid, access_token: accessToken, refresh_token: refreshToken });
@@ -91,13 +91,13 @@ const LoginService = async (email, password, callback) => {
         const accessToken = jwt.sign(
             { userId: user.dataValues.userid, email: user.dataValues.email },
             accessTokenSecret,
-            { expiresIn: '1h' } // Access token valid for 1 hour
+            { expiresIn: '30d' } // Access token valid for 1 hour
         );
 
         const refreshToken = jwt.sign(
             { userId: user.dataValues.userid, email: user.dataValues.email },
             refreshTokenSecret,
-            { expiresIn: '7d' } // Refresh token valid for 7 days
+            { expiresIn: '60d' } // Refresh token valid for 7 days
         );
 
         // Save the jwt tokens in the database

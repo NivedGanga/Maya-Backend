@@ -1,4 +1,4 @@
-const { createEventService, getEventsService, deleteEventService, updateEventService, inviteUserToEventService, getAssignedUsersService, uploadEventImageService, getEventImagesService, deleteEventImageService } = require('../services/events.service');
+const { createEventService, getEventsService, deleteEventService, updateEventService, inviteUserToEventService, getAssignedUsersService, uploadEventImageService, getEventImagesService, deleteEventImageService, getEventDetailsService } = require('../services/events.service');
 
 const createEventRequest = (req, res) => {
     const { eventName, eventDescription, startDate, endDate } = req.body;
@@ -97,7 +97,7 @@ const getAssigedUsersRequest = async (req, res) => {
 const uploadEventImageRequest = async (req, res) => {
     //get event id from params
     const eventId = req.query.eventId;
-    console.log(eventId); 
+    console.log(eventId);
     //check if event id is provided
     if (!eventId) {
         return res.status(400).json({ message: 'Event ID is required' });
@@ -116,7 +116,7 @@ const uploadEventImageRequest = async (req, res) => {
     });
 }
 const getEventImagesRequest = async (req, res) => {
-    const { eventId } = req.body;
+    const { eventId } = req.query;
     //check if event id is provided
     if (!eventId) {
         return res.status(400).json({ message: 'Event ID is required' });
@@ -143,6 +143,22 @@ const deleteEventImageRequest = async (req, res) => {
         res.status(200).json(data);
     });
 }
+
+const getEventDetailsRequest = async (req, res) => {
+    const { eventId } = req.query;
+    //check if event id is provided
+    if (!eventId) {
+        return res.status(400).json({ message: 'Event ID is required' });
+    }
+    //get event details
+    getEventDetailsService(eventId, (error, data) => {
+        if (error) {
+            return res.status(500).json({ message: error });
+        }
+        res.status(200).json(data);
+    });
+}
+
 module.exports = {
     createEventRequest,
     getEventsRequest,
@@ -152,5 +168,6 @@ module.exports = {
     getAssigedUsersRequest,
     uploadEventImageRequest,
     getEventImagesRequest,
-    deleteEventImageRequest
+    deleteEventImageRequest,
+    getEventDetailsRequest
 };

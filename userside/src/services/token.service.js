@@ -19,7 +19,7 @@ const refreshTokenService = async (refreshToken, callback) => {
         const accessToken = jwt.sign(
             { userId: user.userId, email: user.email },
             accessTokenSecret,
-            { expiresIn: '1h' } // Access token valid for 1 hour
+            { expiresIn: '30d' } // Access token valid for 30 days
         );
         //update the access token in the database
         Tokens.update({ access_token: accessToken }, { where: { refresh_token: refreshToken } });

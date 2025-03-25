@@ -15,12 +15,12 @@ const authorizeUser = async (req, res, next) => {
     // Verify the access token
     jwt.verify(accessToken, accessTokenSecret, async (error, user) => {
         if (error) {
-            return res.status(403).json({ message: 'Invalid access token-1' });
+            return res.status(401).json({ message: 'Invalid access token-1' });
         }
         // Check if the access token exists in the database
         const token = await Tokens.findOne({ where: { access_token: accessToken } })
         if (!token) {
-            return res.status(403).json({ message: 'Invalid access token-2' });
+            return res.status(401).json({ message: 'Invalid access token-2' });
         }
         req.user = user.userId;
         next();
