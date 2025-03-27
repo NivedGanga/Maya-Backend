@@ -47,6 +47,7 @@ const createEventService = async (eventName, eventDescription, startDate, endDat
         callback(error.message || 'Error creating event', null);
     }
 }
+
 const getEventsService = async (status, callback) => {
     try {
         // Find all events
@@ -65,7 +66,6 @@ const getEventsService = async (status, callback) => {
                 where: { eventid: event.eventid },
                 order: [['fileid', 'ASC']] // Get the first uploaded image
             });
-
             // Add banner URL to event object
             event.banner = banner ? banner.url : null;
         }
@@ -298,6 +298,14 @@ const getEventDetailsService = async (eventId, callback) => {
         if (!event) {
             return callback({ message: "Event not found" }, null);
         }
+        // Check if the filestore table has any image with this eventId
+        const banner = await Filestore.findOne({
+            where: { eventid: eventId },
+            order: [['fileid', 'ASC']] // Get the file with the least fileid
+        });
+
+        // Add the banner URL to the event object if found
+        event.dataValues.banner = banner ? banner.url : null;
 
         // Respond with the event
         callback(null, { event: event });

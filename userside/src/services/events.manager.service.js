@@ -1,11 +1,11 @@
-const { Events, User, Work } = require('../models');
+const { Events, User, Work, Filestore } = require('../models');
 
 const getAssignedEventsService = async (userId, callback) => {
     try {
         // Find all events assigned to the user from work
         const assignedEvents = await Work.findAll({ where: { userid: userId } });
         // Get the event details for each event from Events
-        const events = await Promise.all(assignedEvents.map(async (assignedEvent) => {
+        let events = await Promise.all(assignedEvents.map(async (assignedEvent) => {
             const event = await Events.findOne({ where: { eventid: assignedEvent.eventid } });
             return event;
         }));
@@ -13,6 +13,16 @@ const getAssignedEventsService = async (userId, callback) => {
         if (!events) {
             return callback({ message: "No events founded" }, null);
         }
+        // Check for files in the filestore for each event
+        const eventsWithFiles = await Promise.all(events.map(async (event) => {
+            const file = await Filestore.findOne({
+                where: { eventid: event.eventid },
+                order: [['fileid', 'ASC']] // Get the file with the least fileid
+            });
+            return { ...event.toJSON(), file };
+        }));
+        // Replace events with eventsWithFiles
+        events = eventsWithFiles;
         // Respond with success
         callback(null, events);
     } catch (error) {
@@ -23,8 +33,10 @@ const getAssignedEventsService = async (userId, callback) => {
 
 const getWorkInvitationsSerice = async (userId, callback) => {
     try {
+
         // Find all events assigned to the user from work
-        const assignedEvents = await Work.findAll({ where: { userid: userId, isAccepted: false } });
+        const assignedEvents = await Work.findAll({ where: { userid: userId, isAccepted: 0 } });
+        console.log(assignedEvents);
         // Get the event details for each event from Events
         const events = await Promise.all(assignedEvents.map(async (assignedEvent) => {
             const event = await Events.findOne({ where: { eventid: assignedEvent.eventid } });

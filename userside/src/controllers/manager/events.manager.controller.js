@@ -2,12 +2,13 @@ const { getAssignedEventsService, acceptWorkInvitationService, getWorkInvitation
 
 const getAssignedEventsRequest = (req, res) => {
     const user = req.user;
+    console.log(user);
     //check if user id is provided
     if (!user) {
         return res.status(400).json({ message: 'User ID is required' });
     }
     //get assigned events
-    getAssignedEventsService(user, (error, events) => {
+    getAssignedEventsService(user.userId, (error, events) => {
         if (error) {
             return res.status(500).json({ message: error });
         }
@@ -19,12 +20,12 @@ const getAssignedEventsRequest = (req, res) => {
 
 const getWorkInvitationsRequest = (req, res) => {
     const user = req.user;
-    //check if user id is provided
+    //check if user id is provided 
     if (!user) {
         return res.status(400).json({ message: 'User ID is required' });
     }
     //get work invitations
-    getWorkInvitationsSerice(user, (error, events) => {
+    getWorkInvitationsSerice(user.userId, (error, events) => {
         if (error) {
             return res.status(500).json({ message: error });
         }
@@ -34,13 +35,15 @@ const getWorkInvitationsRequest = (req, res) => {
 
 const acceptWorkInvitationRequest = (req, res) => {
     const user = req.user;
+    console.log(user);
+    console.log(req.body)
     const { eventId } = req.body;
-    //check if user id and event id is provided
+    //check if user id and event id is provided 
     if (!user || !eventId) {
-        return res.status(400).json({ message: 'User ID and Event ID is required' });
+        return res.status(400).json({ message: 'User ID and Event ID is required to accept' });
     }
     //accept work invitation
-    acceptWorkInvitationService(user, eventId, (error, data) => {
+    acceptWorkInvitationService(user.userId, eventId, (error, data) => {
         if (error) {
             return res.status(500).json({ message: error });
         }
@@ -50,10 +53,12 @@ const acceptWorkInvitationRequest = (req, res) => {
 
 const rejectWorkInvitationRequest = (req, res) => {
     const user = req.user;
+    console.log(user);
+    console.log(req.body)
     const { eventId } = req.body;
     //check if user id and event id is provided
     if (!user || !eventId) {
-        return res.status(400).json({ message: 'User ID and Event ID is required' });
+        return res.status(400).json({ message: 'User ID and Event ID is required to reject' });
     }
     //reject work invitation
     rejectWorkInvitationService(user, eventId, (error, data) => {
