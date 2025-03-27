@@ -1,7 +1,8 @@
+
 const authorizeUser = async (req, res, next) => {
     const jwt = require('jsonwebtoken');
     const dotenv = require('dotenv').config();
-    const { Tokens } = require('../models');
+    const { Tokens, Roles } = require('../models');
     // Get the access token from the request
     const at = req.headers['authorization'];
     if (!at) {
@@ -22,7 +23,11 @@ const authorizeUser = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ message: 'Invalid access token-2' });
         }
-        req.user = user.userId;
+        req.user = user;
+        const entry = await Roles.findOne({ where: { userid: user.userId } });
+        if (entry.dataValues.Status === 'pending') {
+            return res.status(406).json({ message: 'Admin approval needed', status: 'pending' });
+        }
         next();
         console.log('User authorized-2');
         return;

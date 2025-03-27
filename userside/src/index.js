@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const sessionMiddleware = require('./middleware/session.middleware');
 const adminMiddleware = require('./middleware/admin.middleware');
 const dotenv = require('dotenv').config();
 const authorizeUser = require('./middleware/tokens.middleware');
@@ -20,8 +19,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(sessionMiddleware);
 
 // Import route
 const routes = require('./routes');

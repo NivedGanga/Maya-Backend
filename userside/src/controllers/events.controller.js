@@ -1,13 +1,14 @@
 const { createEventService, getEventsService, deleteEventService, updateEventService, inviteUserToEventService, getAssignedUsersService, uploadEventImageService, getEventImagesService, deleteEventImageService, getEventDetailsService } = require('../services/events.service');
 
 const createEventRequest = (req, res) => {
-    const { eventName, eventDescription, startDate, endDate } = req.body;
+    const { eventName, eventDescription, startDate, endDate, managers } = req.body;
     //check if all required fields are present
+    console.log(req.body);
     if (!eventName || !startDate || !endDate) {
         return res.status(400).json({ error: 'Missing required fields' });
-    }
+    } 
     //create event 
-    createEventService(eventName, eventDescription, startDate, endDate, (error, data) => {
+    createEventService(eventName, eventDescription, startDate, endDate, managers, (error, data) => {
         if (error) {
             return res.status(400).json({ error });
         }
@@ -16,6 +17,7 @@ const createEventRequest = (req, res) => {
 }
 
 const getEventsRequest = async (req, res) => {
+    console.log("helooooooooooo")
     const status = req.query.status ?? 'all';
     //check status is valid
     if (status !== 'upcoming' && status !== 'ongoing' && status !== 'completed' && status !== 'all') {

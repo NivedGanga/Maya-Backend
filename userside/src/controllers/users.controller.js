@@ -2,7 +2,7 @@ const { getUsersService, acceptUserService, rejectUserService } = require("../se
 
 const getUsersRequest = async (req, res) => {
     const status = req.query.status;
-    const email = req.query.email ?? "";
+    const email = req.query.query ?? "";
     //check status is provided
     if (!status) {
         return res.status(400).json({ message: 'Status is required' });
@@ -52,5 +52,19 @@ const rejectUserRequest = async (req, res) => {
         res.status(200).json(data);
     });
 }
-
-module.exports = { getUsersRequest, acceptUserRequest, rejectUserRequest };
+const getUserRole = async (req, res) => {
+    const { Roles } = require('../models');
+    console.log(req.user); 
+    const { userId } = req.user;
+    try {
+        const role = await Roles.findOne({ where: { userid: userId } });
+        if (!role) {
+            return res.status(404).json({ message: 'Role not found' });
+        }
+        return res.status(200).json({ role: role.dataValues.Role });
+    } catch (error) { 
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+module.exports = { getUsersRequest, acceptUserRequest, rejectUserRequest, getUserRole };

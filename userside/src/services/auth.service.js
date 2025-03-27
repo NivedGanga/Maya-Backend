@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv').config();
 const OtpService = async (email, callback) => {
     const transporter = require("../config/nodemailer");
     const otpGenerator = require("otp-generator");
+    const { Otps } = require("../models");
     const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, lowerCaseAlphabets: false, upperCaseAlphabets: false, digits: true, });
     try {
         const mailOptions = {
@@ -14,11 +15,30 @@ const OtpService = async (email, callback) => {
         };
         console.log(`OTP for ${email} is ${otp}`);
         await transporter.sendMail(mailOptions);
+        await Otps.create({ email, otp, expires: Date.now() + 300000 });
     } catch (error) {
         console.error(error);
         callback(error, null);
     }
     callback(null, otp);
+}
+
+const verifyOtpService = async (email, otp, callback) => {
+    const { Otps } = require("../models");
+    try {
+        const otpData = await Otps.findOne({ where: { email, otp } });
+        if (!otpData) {
+            return callback('Invalid OTP', null);
+        }
+        if (otpData.expires < Date.now()) {
+            return callback('OTP expired', null);
+        }
+        await Otps.update({ is_verified: true }, { where: { email, otp } });
+        callback(null, 'OTP verified');
+    } catch (error) {
+        console.error(error);
+        callback(error, null);
+    }
 }
 
 const SignupService = async (email, password, callback) => {
@@ -69,7 +89,7 @@ const SignupService = async (email, password, callback) => {
 };
 
 const LoginService = async (email, password, callback) => {
-    const { User, Tokens } = require("../models");
+    const { User, Tokens, Roles } = require("../models");
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET; // Secret key for signing the access token
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET; // Secret key for signing the refresh token
 
@@ -105,14 +125,16 @@ const LoginService = async (email, password, callback) => {
         if (!tokens) {
             return callback('Token not created', null);
         }
-
+        //checkrole 
+        const role = await Roles.findOne({ where: { userid: user.dataValues.userid } });
         // Respond with tokens
         callback(null, {
             message: 'Login successful',
             accessToken: accessToken,
-            refreshToken: refreshToken
+            refreshToken: refreshToken,
+            role: role.dataValues.Role 
         });
-
+ 
         console.log('Login successful');
 
     } catch (error) {
@@ -150,7 +172,8 @@ module.exports = {
     OtpService,
     SignupService,
     LoginService,
-    LogoutService
+    LogoutService,
+    verifyOtpService
 };
 // broker.id = 0
 // cluster.id = DIOvMR31SpeAvzWohCVuUQ

@@ -3,6 +3,7 @@ const adminMiddleware = async (req, res, next) => {
     const jwt = require('jsonwebtoken');
     const dotenv = require('dotenv').config();
     const { Tokens, Roles } = require('../models');
+    console.log('admin middleware');
     // Get the access token from the request
     const at = req.headers['authorization'];
     if (!at) {

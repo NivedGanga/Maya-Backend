@@ -9,7 +9,7 @@ WORKDIR /app
 # Install dependencies
 COPY package.json package-lock.json ./ 
 RUN npm install
-RUN npm install bcrypt
+RUN npm install bcryptjs
 
 # Copy project files
 COPY . . 

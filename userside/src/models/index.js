@@ -4,6 +4,7 @@ const Roles = require('./roles.model');
 const Events = require('./events.model');
 const Work = require('./work.model');
 const Filestore = require('./filestore.model');
+const Otps = require('./otps.model');
 // Define associations
 User.hasMany(Tokens, { foreignKey: 'userid', onDelete: 'CASCADE' });
 Tokens.belongsTo(User, { foreignKey: 'userid' });
@@ -21,4 +22,4 @@ Work.belongsTo(User, { foreignKey: 'userid' });
 Events.hasMany(Filestore, { foreignKey: 'eventid', onDelete: 'CASCADE' });
 Filestore.belongsTo(Events, { foreignKey: 'eventid' });
 
-module.exports = { User, Tokens, Roles, Events, Work,Filestore };
+module.exports = { User, Tokens, Roles, Events, Work, Filestore , Otps};

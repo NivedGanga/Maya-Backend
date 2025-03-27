@@ -1,32 +1,52 @@
-const { Events, Filestore } = require('../models');
+const { Events, Filestore, Work } = require('../models');
 const { upload } = require('../config/file');
 const fs = require("fs");
 const path = require("path");
 const { fetchAndSendBatch } = require('./imageproc.service');
 const { Readable } = require("stream"); // For converting buffer to stream
 const cloudinary = require('../config/cloudinary');
-const createEventService = (eventName, eventDescription, startDate, endDate, callback) => {
+const createEventService = async (eventName, eventDescription, startDate, endDate, managers, callback) => {
     try {
+        // Validate required fields
+        if (!eventName || !eventDescription || !startDate || !endDate) {
+            return callback('Missing required event fields', null);
+        }
+
         // Create the event
-        const event = Events.create({
+        const event = await Events.create({
             eventname: eventName,
             description: eventDescription,
             startDate,
             endDate,
         });
-        // check if event is created
+ 
+        // Check if event is created
         if (!event) {
             return callback('Event not created', null);
         }
+
+        // Refresh the event instance to get the auto-incremented ID
+        const createdEvent = await event.reload();
+
+        // Add all managers to the work table
+        await Promise.all(managers.map(async managerId => {
+            await Work.create({
+                eventid: createdEvent.eventid,
+                userid: managerId,
+                isAccepted: false,
+            });
+        }));
+
         // Respond with success message
-        callback(null, { message: 'Event created' });
+        callback(null, {
+            message: 'Event created successfully',
+            eventId: createdEvent.eventid
+        });
     } catch (error) {
-        // Log the error
-        console.error(error);
-        callback(error, null);
+        console.error('Error in createEventService:', error);
+        callback(error.message || 'Error creating event', null);
     }
 }
-
 const getEventsService = async (status, callback) => {
     try {
         // Find all events
